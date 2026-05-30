@@ -1,120 +1,55 @@
-# Notification System Design
+Notification System Design
 
-## Approach
+Introduction
 
-The application processes campus notifications in TypeScript and keeps only unread items in the ranking pipeline. The top N list is maintained with a bounded selection strategy so the system can handle continuous incoming notifications without sorting the entire collection on every update.
+This project is developed to display campus notifications in a simple and organized way. The notifications are fetched from the provided API and shown to users through a React application.
 
-## Ranking Strategy
+The project contains:
 
-1. Placement notifications outrank Result notifications.
-2. Result notifications outrank Event notifications.
-3. Within the same type, newer notifications rank higher.
-4. Read notifications are excluded.
+- Logging Middleware
+- Frontend Application
 
-## Handling Incoming Notifications
+Stage 1
 
-Incoming notifications are validated, filtered by unread status, scored by notification type, and inserted into the bounded ranking set. If the collection grows beyond N, the lowest-ranked item is removed immediately.
+In the first stage, the main task is to find the most important unread notifications.
 
-## Scalability
+The priority order used is:
 
-The algorithm keeps a bounded working set, so space usage remains proportional to N rather than to the total stream size. This supports real-time updates and large notification volumes.
+1. Placement
+2. Result
+3. Event
 
-## Complexity
+If two notifications belong to the same category, the latest one is given higher priority.
 
-- Time complexity: O(m log N) for m processed notifications.
-- Space complexity: O(N).
+The notifications are filtered, sorted according to priority, and the top notifications are displayed.
 
-## Screenshot Checklist
+Stage 2
 
-1. Desktop dashboard screenshot.
-2. Mobile dashboard screenshot.
-3. Notifications page screenshot.
-4. Priority notifications screenshot.
-5. Error state screenshot.
-6. Loading state screenshot.# Notification System Design
+In the second stage, a React frontend application is created.
 
-## 1. System Overview
+The application allows users to:
 
-The frontend is a React + TypeScript notification management dashboard that lets users review, search, filter, update, and delete notifications. A reusable logging middleware captures operational events without blocking the user experience.
+- View notifications
+- Search notifications
+- Filter notifications by type
+- Navigate through pages using pagination
+- View important notifications separately
 
-## 2. Architecture Diagram
+The interface is responsive and works on mobile and desktop devices.
 
-```mermaid
-flowchart LR
-  U[User] --> UI[React UI]
-  UI --> C[Context State]
-  UI --> API[Axios API Layer]
-  API --> S[(Notification Service)]
-  UI --> L[Logging Middleware]
-  L --> LA[(Log API)]
-  S --> DB[(Notifications Data Source)]
-```
+Logging
 
-## 3. Component Diagram
+A reusable logging middleware is used in different parts of the application.
 
-```mermaid
-flowchart TB
-  App --> Router
-  Router --> DashboardPage
-  Router --> NotificationsPage
-  Router --> NotificationDetailsPage
-  Router --> SettingsPage
-  Router --> NotFoundPage
-  NotificationsPage --> NotificationFilters
-  NotificationsPage --> NotificationList
-  NotificationList --> NotificationCard
-  App --> NotificationProvider
-```
+Logs are generated for:
 
-## 4. Data Flow
+- API calls
+- Page loading
+- User actions
+- Error handling
 
-1. The app loads notification data through the Axios service.
-2. Context stores notifications, loading state, and error state.
-3. UI components render filtered results from the context.
-4. User actions update local state and persist to the API or mock data store.
-5. Important actions are logged through the middleware.
+This helps in tracking application activities and debugging issues.
 
-## 5. Notification Flow
+Conclusion
 
-1. Dashboard loads summary counts and recent notifications.
-2. Notifications page fetches the list and allows search and filtering.
-3. Details page shows metadata, content, and current status.
-4. Read, mark-all-read, and delete actions update both UI state and backend state.
-
-## 6. API Layer Design
-
-- Axios instance centralizes base URL, headers, and interceptors.
-- Request interceptor attaches auth context and emits debug logs.
-- Response interceptor normalizes successful responses and errors.
-- Error handling converts transport failures into UI-safe messages.
-
-## 7. State Management Design
-
-- React Context stores notifications and global loading/error state.
-- Derived selectors handle unread counts, search, filter, and pagination.
-- Local form state handles settings and validation.
-
-## 8. Scalability Considerations
-
-- Separate API, hooks, pages, components, and utilities for maintainability.
-- Mock-backed local storage fallback allows development without backend access.
-- Context can be replaced later without changing page contracts.
-
-## 9. Error Handling Strategy
-
-- Every async action uses try/catch.
-- User-facing errors are shown through inline error states and toast notifications.
-- Logging failures never propagate to the UI.
-
-## 10. Logging Strategy
-
-- Logs are emitted for page loads, component renders, cache misses, API failures, and state transitions.
-- The middleware validates stack, level, package, and message before sending.
-- Logging uses bearer authentication and timeouts so failures degrade safely.
-
-## 11. Security Considerations
-
-- Bearer token is read from environment configuration.
-- Input validation prevents malformed requests.
-- The logging middleware never exposes secrets in UI state.
-- API wrappers avoid unsafe HTML rendering.
+The project provides a simple way to manage and view campus notifications. Important notifications are prioritized, and the frontend offers an easy-to-use interface for users.
