@@ -1,0 +1,1 @@
+export { getBearerToken } from "./token";
